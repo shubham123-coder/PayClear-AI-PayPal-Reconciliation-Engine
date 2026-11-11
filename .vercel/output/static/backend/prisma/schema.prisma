@@ -1,0 +1,91 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// 1. The User Table
+model User {
+  id            String         @id @default(uuid())
+  email         String         @unique
+  passwordHash  String
+  name          String
+  businessName  String?
+  createdAt     DateTime       @default(now())
+
+  invoices      Invoice[]
+  transactions  Transaction[]
+  chatMessages  ChatMessage[]
+}
+
+// 2. The Invoice Table
+model Invoice {
+  id                    String   @id @default(uuid())
+  userId                String?  // Optional for backward compatibility with demo data
+  paypalInvoiceId       String?  @unique
+  invoiceNumber         String
+  customerName          String
+  customerEmail         String
+  totalAmountCents      Int
+  paidAmountCents       Int      @default(0)
+  currency              String   @default("USD")
+  status                String   @default("SENT")
+  isSimulation          Boolean  @default(false)
+  dueDate               DateTime?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  user                  User?    @relation(fields: [userId], references: [id])
+  matches               ReconciliationMatch[]
+}
+
+// 3. The Transaction Table
+model Transaction {
+  id                    String   @id @default(uuid())
+  userId                String?
+  paypalTransactionId   String   @unique
+  payerName             String?
+  payerEmail            String?
+  grossAmountCents      Int
+  feeAmountCents        Int      @default(0)
+  netAmountCents        Int
+  currency              String   @default("USD")
+  status                String   @default("UNRECONCILED")
+  isSimulation          Boolean  @default(false)
+  transactionDate       DateTime
+  note                  String?
+  createdAt             DateTime @default(now())
+
+  user                  User?    @relation(fields: [userId], references: [id])
+  matches               ReconciliationMatch[]
+}
+
+// 4. The Reconciliation Match Table
+model ReconciliationMatch {
+  id              String      @id @default(uuid())
+  invoiceId       String
+  transactionId   String
+  matchType       String
+  confidenceScore Float
+  aiExplanation   String?
+  status          String      @default("SUGGESTED")
+  isSimulation    Boolean     @default(false)
+  createdAt       DateTime    @default(now())
+
+  invoice         Invoice     @relation(fields: [invoiceId], references: [id])
+  transaction     Transaction @relation(fields: [transactionId], references: [id])
+}
+
+// 5. The Chat Message Table (User-Isolated Copilot History)
+model ChatMessage {
+  id        String   @id @default(uuid())
+  userId    String
+  role      String   // 'user' or 'assistant'
+  text      String
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}

@@ -1,0 +1,25 @@
+# Dependencies
+node_modules
+*/node_modules
+
+# Environment Variables & Secrets
+.env
+backend/.env
+*.env.local
+
+# Build artifacts
+dist
+frontend/dist
+.cache
+
+# SQLite Database (for persistent cloud, keep local database private)
+*.db-journal
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# System & OS
+.DS_Store
+Thumbs.db
