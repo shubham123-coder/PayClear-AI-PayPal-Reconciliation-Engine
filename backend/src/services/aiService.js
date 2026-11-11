@@ -10,7 +10,7 @@
 const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
 const DEFAULT_OPENROUTER_MODEL = 'nvidia/nemotron-3.5-super-vl:free';
 const FALLBACK_OPENROUTER_MODEL = 'openrouter/free';
-const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent';
 
 function hasOpenRouterKey() {
   const key = process.env.OPENROUTER_API_KEY;
